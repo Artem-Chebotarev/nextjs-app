@@ -1,7 +1,7 @@
 import { Inter } from '@next/font/google'
-import styles from '@/styles/Home.module.scss'
 import { Meta } from '@/app/utils/Meta'
 import { TCard } from '@/app/data'
+import { CardItem } from '@/app/cards/CardItem'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,13 +13,14 @@ interface HomeProps {
 export default function Home(props: HomeProps) {
   const { cards }  = props;
 
-  console.log(cards)
   return (
     <>
       <Meta title={'Главная'} description={'Описание страницы'}/>
-      <main className={styles.main}>
-        nunitodasdasdksafkldsaj kfjds afhdsjahf jkasdlfs
-        NUNITOOOOOOO
+
+      <main className='w-1/4 mx-auto mt-20'>
+        {cards.map((elem) => (
+          <CardItem key={elem.id} card={elem}/>
+        ))}
       </main>
     </>
   )
@@ -31,13 +32,20 @@ export default function Home(props: HomeProps) {
  * вместо этого используем getStaticProps
  */
 export const getStaticProps = async () => {
-  const response =  await fetch('http://localhost:3000/api/cards')
-  const cards = await response.json();
-
-  return {
-    props: {
-      cards
-    },
-    revalidate: 10,
+  try {
+      const response =  await fetch('http://localhost:3000/api/cards')
+      const cards = await response.json();
+    
+      return {
+        props: {
+          cards
+        },
+        revalidate: 10,
+      }
+  } catch(error) {
+      return {
+        notFound: true,
+      }
   }
+  
 }
