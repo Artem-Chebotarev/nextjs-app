@@ -1,5 +1,8 @@
+import { CardItem } from "@/app/cards/CardItem";
 import { TCard } from "@/app/data"
+import { Meta } from "@/app/utils/Meta";
 import { GetStaticProps } from "next"
+import Link from "next/link";
 
 interface CardProps {
     card: TCard,
@@ -7,34 +10,54 @@ interface CardProps {
 
 const Card = (props: CardProps) => {
     const { card } = props;
-    return <div>{card.number}</div>
+    return (
+        <>
+            <Meta title={'Страница карточки'} description={'Описание карточки'}/>
+
+            <main className='w-1/4 mx-auto mt-20'>
+                <CardItem card={card}/>
+                <Link href={'/'}>Back to home</Link>
+            </main>
+        </>
+    )
 }
 
 export const getStaticPaths = async () => {
-    const response =  await fetch('http://localhost:3000/api/cards')
-    const cards = await response.json();
+    try {
+        const response =  await fetch('http://localhost:3000/api/cards')
+        const cards = await response.json();
 
-    const paths = cards.map((el: TCard) => ({ params: { id: el.id }}));
+        const paths = cards.map((el: TCard) => ({ params: { id: el.id }}));
 
-    return { paths, fallback: 'blocking'}
+        return { paths, fallback: 'blocking'}
+    } catch (error) {
+        return { paths: [], fallback: false}
+    }
+    
 }
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-    if (params && params.id) {
-        const response =  await fetch(`http://localhost:3000/api/cards/${params.id}`)
-        const card = await response.json();
-      
+    try {
+        if (params && params.id) {
+            const response =  await fetch(`http://localhost:3000/api/cards/${params.id}`)
+            const card = await response.json();
+          
+            return {
+              props: {
+                card
+              },
+              revalidate: 10,
+            }
+        }
+    
         return {
-          props: {
-            card
-          },
-          revalidate: 10,
+            props: { error: true },
+        };
+    } catch(error) {
+        return {
+          notFound: true,
         }
     }
-
-    return {
-        props: { error: true },
-    };
 }
 
 export default Card;

@@ -14,7 +14,7 @@ export const cards: TCard[] = [
     },
     {
         id: '2',
-        balance: 123_000,
+        balance: 345_123_000,
         number: '5812 3333 8945 0987',
         color: '#0095FF',
     }
